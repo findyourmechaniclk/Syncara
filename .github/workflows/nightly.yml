@@ -11,6 +11,10 @@ on:
       - ".github/workflows/website.yml"
       - ".github/workflows/release.yml"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   FLUTTER_CHANNEL: "stable"
 
@@ -28,7 +32,7 @@ jobs:
         run: |
           COMMIT_HASH=$(git rev-parse --short HEAD)
           CURRENT_VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //')
-          NEW_VERSION=$(echo $CURRENT_VERSION | sed "s/+/-$COMMIT_HASH+/")
+          NEW_VERSION=$(echo $CURRENT_VERSION | sed "s/+/-$COMMIT_HASH+/)"
           echo "version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "commit-hash=$COMMIT_HASH" >> $GITHUB_OUTPUT
           echo "Generated version: $NEW_VERSION"
